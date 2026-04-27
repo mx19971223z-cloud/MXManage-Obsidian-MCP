@@ -14,9 +14,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/mx00001223/MXManage-Obsidian-MCP.git"
+    "url": "https://github.com/mx19971223z-cloud/MXManage-Obsidian-MCP.git"
   },
-  "homepage": "https://gitee.com/mx00001223/MXManage-Obsidian-MCP#readme",
+  "homepage": "https://github.com/mx19971223z-cloud/MXManage-Obsidian-MCP#readme",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
