@@ -10,16 +10,13 @@
     "oauth",
     "docker"
   ],
-  "author": "eddmann",
+  "author": "MXManage",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eddmann/obsidian-mcp.git"
+    "url": "https://gitee.com/mx00001223/MXManage-Obsidian-MCP.git"
   },
-  "homepage": "https://github.com/eddmann/obsidian-mcp#readme",
-  "bugs": {
-    "url": "https://github.com/eddmann/obsidian-mcp/issues"
-  },
+  "homepage": "https://gitee.com/mx00001223/MXManage-Obsidian-MCP#readme",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
@@ -36,9 +33,7 @@
     "lint": "eslint \"packages/**/*.{ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "npm run test --workspace @obsidian-mcp/app",
-    "test:watch": "npm run test:watch --workspace @obsidian-mcp/app"
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "eslint": "^9.13.0",

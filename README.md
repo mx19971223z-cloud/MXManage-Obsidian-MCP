@@ -77,3 +77,12 @@ cp .env.example .env
 <p align="right">
   Made with ❤️ for the Obsidian Community
 </p>
+
+---
+
+**版权 & 贡献**
+
+- © 2026 MXManage。保留所有权利。
+- 许可证：MIT，见 [LICENSE](LICENSE)
+- 欢迎贡献：请在仓库中提交 Issue 或 Pull Request（查看 [CONTRIBUTING.md](.github/CONTRIBUTING.md) 了解代码风格与提交流程）。
+

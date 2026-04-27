@@ -10,7 +10,6 @@
 - `npm run build`：构建应用
 - `npm run dev`：启动 stdio 模式（开发/本地）
 - `npm run dev:http`：启动 http 模式（开发/远程）
-- `npm run test`：运行单元测试
 - `npm run lint`：代码检查
 
 ## 📦 部署前准备
