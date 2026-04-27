@@ -10,7 +10,7 @@
 
 面向个人与团队知识库的 **Obsidian MCP 服务**。
 
-该项目通过 MCP 协议将 AI 客户端与 Git 托管的 Obsidian 仓库深度集成。AI 每次写入后都会自动执行 Git 同步（commit/push），确保您的全端笔记库实时更新且安全一致。
+该项目通过 MCP 协议将 AI 客户端与 Git 托管的 Obsidian 仓库深度集成。AI 每次写入后都会自动执行 Git 同步（commit/push），确保您的全端笔记库实时更新和安全一致。
 
 ---
 
