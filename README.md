@@ -1,6 +1,10 @@
 # 💎 MXManage Obsidian MCP
 
 <p align="center">
+  <img src="assets/heading.png" alt="MXManage Obsidian MCP" width="100%">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/MCP-Protocol-blue?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/Obsidian-Vault-purple?style=for-the-badge" alt="Obsidian">
   <img src="https://img.shields.io/badge/Git-Auto--Sync-orange?style=for-the-badge" alt="Git Sync">
