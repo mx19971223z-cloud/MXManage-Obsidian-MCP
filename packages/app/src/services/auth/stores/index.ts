@@ -9,3 +9,4 @@ export type {
 } from './types.js';
 
 export { InMemoryAuthStore, createInMemoryAuthStore } from './in-memory-store.js';
+export { FileAuthStore, createFileAuthStore } from './file-store.js';

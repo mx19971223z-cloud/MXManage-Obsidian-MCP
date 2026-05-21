@@ -67,6 +67,27 @@ export const DeleteNoteSchema = {
   },
 };
 
+export const BulkDeleteSchema = {
+  inputSchema: {
+    paths: z
+      .array(z.string())
+      .optional()
+      .describe('Array of file paths to delete (maximum 5 files total)'),
+    folders: z
+      .array(z.string())
+      .optional()
+      .describe('Array of folder paths to delete (maximum 3 folders total)'),
+    confirm: z.boolean().describe('Must be true to confirm deletion'),
+  },
+  outputSchema: {
+    success: z.boolean(),
+    deleted_files: z.array(z.string()),
+    deleted_folders: z.array(z.string()),
+    total_files: z.number(),
+    total_folders: z.number(),
+  },
+};
+
 export const MoveNoteSchema = {
   inputSchema: {
     source_path: z.string().describe('Current path of the file'),

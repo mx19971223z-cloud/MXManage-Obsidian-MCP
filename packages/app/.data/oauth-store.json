@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "sessions": [
+    {
+      "sessionId": "bNT69ITgIc_ZtY7es8kIxegiUP36U-uahn0Syb0uv_0",
+      "authenticated": true,
+      "createdAt": 1778918742469,
+      "expiresAt": 1779005142469
+    }
+  ],
+  "authCodes": [],
+  "accessTokens": [
+    {
+      "token": "ZCCDIVnp72e7Vre-E3fzD9pf3oqnV0jbv3u2DapGqnQ",
+      "refreshToken": "VP5oR-A6V_d9LS87aBaX-QDjEbSUqQBiLdN0zfK-7CY",
+      "createdAt": 1779283642368,
+      "expiresAt": 1779287242368,
+      "scope": "vault:read vault:write"
+    }
+  ],
+  "refreshTokens": [
+    {
+      "refreshToken": "VP5oR-A6V_d9LS87aBaX-QDjEbSUqQBiLdN0zfK-7CY",
+      "accessToken": "ZCCDIVnp72e7Vre-E3fzD9pf3oqnV0jbv3u2DapGqnQ"
+    }
+  ]
+}

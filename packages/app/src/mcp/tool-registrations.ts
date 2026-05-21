@@ -7,6 +7,7 @@ import type { ToolResponse } from '@/mcp/handlers';
 type McpToolResult = {
   content: Array<{ type: 'text'; text: string }>;
   structuredContent?: Record<string, unknown>;
+  isError?: boolean;
 };
 
 function formatToolResult(result: ToolResponse): McpToolResult {
@@ -23,6 +24,8 @@ function formatToolResult(result: ToolResponse): McpToolResult {
       typeof result.data === 'object' && result.data !== null
         ? (result.data as Record<string, unknown>)
         : { value: result.data };
+  } else if (!result.success) {
+    response.isError = true;
   }
 
   return response;
@@ -130,6 +133,28 @@ export function registerTools(server: McpServer, getVaultManager: () => VaultMan
     async args => {
       const vault = getVaultManager();
       const result = await handlers.handleDeleteNote(vault, args);
+      return formatToolResult(result);
+    },
+  );
+
+  server.registerTool(
+    'bulk-delete',
+    {
+      title: 'Bulk Delete',
+      description:
+        'Delete multiple notes or folders with safety limits (max 5 files, 3 folders total)',
+      inputSchema: toolDefs.BulkDeleteSchema.inputSchema,
+      outputSchema: toolDefs.BulkDeleteSchema.outputSchema,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async args => {
+      const vault = getVaultManager();
+      const result = await handlers.handleBulkDelete(vault, args);
       return formatToolResult(result);
     },
   );

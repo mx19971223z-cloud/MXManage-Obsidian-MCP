@@ -248,7 +248,7 @@ export class GitVaultManager implements VaultManager {
     try {
       const stats = await this.getFileStats(relativePath);
       if (stats.isDirectory) {
-        throw new Error(`Cannot delete ${relativePath}: it is a directory`);
+        throw new Error(`Cannot delete ${relativePath}: it is a directory. Use deleteDirectory instead.`);
       }
 
       await fs.unlink(fullPath);
@@ -259,6 +259,31 @@ export class GitVaultManager implements VaultManager {
       });
     } catch (error: any) {
       throw new Error(`Failed to delete file ${relativePath}: ${error.message}`);
+    }
+  }
+
+  /**
+   * Delete a directory
+   * Automatically commits and pushes the change
+   */
+  async deleteDirectory(relativePath: string): Promise<void> {
+    await this.initialize();
+    const fullPath = path.join(this.config.vaultPath, relativePath);
+
+    try {
+      const stats = await this.getFileStats(relativePath);
+      if (!stats.isDirectory) {
+        throw new Error(`Cannot delete ${relativePath}: it is not a directory. Use deleteFile instead.`);
+      }
+
+      await fs.rm(fullPath, { recursive: true, force: true });
+      await this.commitAndPush(`Delete directory: ${relativePath}`, [relativePath]);
+
+      logger.debug('Directory deleted successfully', {
+        path: relativePath,
+      });
+    } catch (error: any) {
+      throw new Error(`Failed to delete directory ${relativePath}: ${error.message}`);
     }
   }
 
@@ -358,6 +383,18 @@ export class GitVaultManager implements VaultManager {
     await this.initialize();
     const fullPath = path.join(this.config.vaultPath, relativePath);
     return existsSync(fullPath);
+  }
+
+  /**
+   * Check if a path is a directory
+   */
+  async isDirectory(relativePath: string): Promise<boolean> {
+    try {
+      const stats = await this.getFileStats(relativePath);
+      return stats.isDirectory;
+    } catch {
+      return false;
+    }
   }
 
   /**

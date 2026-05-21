@@ -726,3 +726,104 @@ function calculateDiffPreview(
 
   return undefined;
 }
+
+export async function handleBulkDelete(
+  vault: VaultManager,
+  args: { paths?: string[]; folders?: string[]; confirm: boolean },
+): Promise<ToolResponse> {
+  try {
+    if (!args.confirm) {
+      throw new Error('Deletion must be confirmed by setting confirm=true');
+    }
+
+    const FILE_LIMIT = 5;
+    const FOLDER_LIMIT = 3;
+
+    const allFilesToDelete = new Set<string>();
+    const allFoldersToDelete = new Set<string>();
+
+    // 1. Process explicitly specified paths
+    if (args.paths) {
+      for (const p of args.paths) {
+        const isDir = await vault.isDirectory(p);
+        if (isDir) {
+          allFoldersToDelete.add(p);
+        } else {
+          allFilesToDelete.add(p);
+        }
+      }
+    }
+
+    // 2. Process explicitly specified folders
+    if (args.folders) {
+      for (const f of args.folders) {
+        allFoldersToDelete.add(f);
+      }
+    }
+
+    // 3. Recursively count contents of folders
+    const initialFolders = Array.from(allFoldersToDelete);
+    for (const folderPath of initialFolders) {
+      const items = await vault.listFiles(folderPath, {
+        recursive: true,
+        includeDirectories: true,
+      });
+      for (const item of items) {
+        if (await vault.isDirectory(item)) {
+          allFoldersToDelete.add(item);
+        } else {
+          allFilesToDelete.add(item);
+        }
+      }
+    }
+
+    // 4. Validate limits
+    if (allFilesToDelete.size > FILE_LIMIT) {
+      throw new Error(
+        `Total files targeted for deletion exceeds limit (${allFilesToDelete.size} > ${FILE_LIMIT}). Folder contents included.`,
+      );
+    }
+    if (allFoldersToDelete.size > FOLDER_LIMIT) {
+      throw new Error(
+        `Total folders targeted for deletion exceeds limit (${allFoldersToDelete.size} > ${FOLDER_LIMIT}). Subdirectories included.`,
+      );
+    }
+
+    // 5. Execute deletion
+    // We only need to delete top-level paths (files or folders) as folders are deleted recursively
+    const allInputPaths = [...(args.paths || []), ...(args.folders || [])];
+    const topLevelPaths = allInputPaths.filter((p, i, self) => {
+      return !self.some((other, j) => i !== j && (p === other || p.startsWith(other + '/')));
+    });
+
+    for (const p of topLevelPaths) {
+      if (await vault.isDirectory(p)) {
+        await vault.deleteDirectory(p);
+      } else {
+        await vault.deleteFile(p);
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        success: true,
+        deleted_files: Array.from(allFilesToDelete),
+        deleted_folders: Array.from(allFoldersToDelete),
+        total_files: allFilesToDelete.size,
+        total_folders: allFoldersToDelete.size,
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        affected_items: topLevelPaths,
+      },
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message,
+      metadata: { timestamp: new Date().toISOString() },
+    };
+  }
+}
+

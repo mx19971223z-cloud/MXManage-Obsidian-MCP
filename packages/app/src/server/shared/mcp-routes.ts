@@ -10,6 +10,38 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import * as auth from '@/services/auth';
 import { logger } from '@/utils/logger';
 
+function maskToken(token: string): string {
+  if (!token) return '';
+  if (token.length <= 8) return `${token.slice(0, 2)}***${token.slice(-1)}`;
+  return `${token.slice(0, 4)}***${token.slice(-4)}`;
+}
+
+function summarizeMcpRequestBody(body: any): Record<string, unknown> {
+  const method = body?.method || 'unknown';
+  const requestId = body?.id ?? null;
+  const params = body?.params || {};
+
+  if (method === 'tools/call') {
+    const toolName = params?.name || 'unknown';
+    const args = params?.arguments || {};
+    return {
+      method,
+      requestId,
+      toolName,
+      argumentKeys: Object.keys(args),
+      queryPreview: typeof args.query === 'string' ? args.query.slice(0, 120) : undefined,
+      path: typeof args.path === 'string' ? args.path : undefined,
+      limit: typeof args.limit === 'number' ? args.limit : undefined,
+    };
+  }
+
+  return {
+    method,
+    requestId,
+    paramKeys: Object.keys(params || {}),
+  };
+}
+
 /**
  * OAuth 中间件：校验 Bearer Token
  */
@@ -17,6 +49,11 @@ async function authenticateToken(req: Request, res: Response, next: NextFunction
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
+    logger.warn('MCP auth rejected: missing bearer token', {
+      path: req.path,
+      ip: req.ip,
+      userAgent: req.get('user-agent') || '',
+    });
     res.status(401).json({
       error: 'unauthorized',
       error_description: 'Missing or invalid Authorization header',
@@ -27,12 +64,23 @@ async function authenticateToken(req: Request, res: Response, next: NextFunction
   const token = authHeader.substring(7);
 
   if (!(await auth.validateAccessToken(token))) {
+    logger.warn('MCP auth rejected: invalid token', {
+      path: req.path,
+      ip: req.ip,
+      token: maskToken(token),
+    });
     res.status(401).json({
       error: 'invalid_token',
       error_description: 'Access token is invalid or expired',
     });
     return;
   }
+
+  logger.debug('MCP auth accepted', {
+    path: req.path,
+    ip: req.ip,
+    token: maskToken(token),
+  });
 
   next();
 }
@@ -65,6 +113,7 @@ export function registerMcpRoute(app: Express, mcpServer: McpServer): void {
     const startTime = Date.now();
     const method = req.body?.method || 'unknown';
     const requestId = req.body?.id;
+    const summary = summarizeMcpRequestBody(req.body);
 
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
@@ -77,16 +126,14 @@ export function registerMcpRoute(app: Express, mcpServer: McpServer): void {
 
     try {
       logger.debug('MCP request received', {
-        method,
-        requestId,
+        ...summary,
       });
 
       await mcpServer.connect(transport);
       await transport.handleRequest(req, res, req.body);
 
       logger.info('MCP request completed', {
-        method,
-        requestId,
+        ...summary,
         durationMs: Date.now() - startTime,
         success: true,
       });
