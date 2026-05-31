@@ -12,6 +12,7 @@
     "build": "tsc -b && npm run build:stdio --workspace @obsidian-mcp/app && npm run build:http --workspace @obsidian-mcp/app",
     "build:stdio": "esbuild src/server/local/stdio.ts --bundle --platform=node --target=node22 --format=esm --tsconfig=tsconfig.json --packages=external --outfile=dist/stdio/index.js",
     "build:http": "esbuild src/server/local/http.ts --bundle --platform=node --target=node22 --format=esm --tsconfig=tsconfig.json --packages=external --outfile=dist/http/index.js",
+    "test": "tsx src/test-runner.ts",
     "dev": "tsx src/server/local/stdio.ts",
     "dev:http": "tsx src/server/local/http.ts",
     "clean": "rm -rf dist"

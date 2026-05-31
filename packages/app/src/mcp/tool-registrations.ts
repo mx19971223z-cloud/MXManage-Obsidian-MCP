@@ -340,6 +340,72 @@ export function registerTools(server: McpServer, getVaultManager: () => VaultMan
   );
 
   server.registerTool(
+    'rag-search',
+    {
+      title: 'RAG Search',
+      description:
+        'Search heading-aware Markdown chunks and return citation-ready snippets for RAG answers',
+      inputSchema: toolDefs.RagSearchSchema.inputSchema,
+      outputSchema: toolDefs.RagSearchSchema.outputSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async args => {
+      const vault = getVaultManager();
+      const result = await handlers.handleRagSearch(vault, args);
+      return formatToolResult(result);
+    },
+  );
+
+  server.registerTool(
+    'build-note-context',
+    {
+      title: 'Build Note Context',
+      description:
+        'Build a budgeted, source-cited context package from notes for grounded writing or Q&A',
+      inputSchema: toolDefs.BuildNoteContextSchema.inputSchema,
+      outputSchema: toolDefs.BuildNoteContextSchema.outputSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async args => {
+      const vault = getVaultManager();
+      const result = await handlers.handleBuildNoteContext(vault, args);
+      return formatToolResult(result);
+    },
+  );
+
+  server.registerTool(
+    'inspect-knowledge-map',
+    {
+      title: 'Inspect Knowledge Map',
+      description:
+        'Inspect Obsidian links, backlinks, tags, and orphan notes around a topic or path scope',
+      inputSchema: toolDefs.InspectKnowledgeMapSchema.inputSchema,
+      outputSchema: toolDefs.InspectKnowledgeMapSchema.outputSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async args => {
+      const vault = getVaultManager();
+      const result = await handlers.handleInspectKnowledgeMap(vault, args);
+      return formatToolResult(result);
+    },
+  );
+
+  server.registerTool(
     'add-tags',
     {
       title: 'Add Tags',

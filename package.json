@@ -30,6 +30,7 @@
     "clean": "rm -rf dist && npm run clean --workspace @obsidian-mcp/app --if-present",
     "dev": "npm run dev --workspace @obsidian-mcp/app",
     "dev:http": "npm run dev:http --workspace @obsidian-mcp/app",
+    "test": "npm run test --workspace @obsidian-mcp/app",
     "lint": "eslint \"packages/**/*.{ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --write .",
