@@ -1,8 +1,8 @@
 # ================= Stage 1: Dependency Initializer =================
-FROM node:22-slim AS base
+FROM registry.npmmirror.com/library/node:22-slim AS base
 WORKDIR /app
-# 设置 NPM 镜像源加速 (可选，按需开启)
-# RUN npm config set registry https://registry.npmmirror.com
+# 设置 NPM 镜像源加速
+RUN npm config set registry https://registry.npmmirror.com
 
 # ================= Stage 2: Builder =================
 FROM base AS builder
@@ -20,7 +20,7 @@ RUN npm run build:stdio --workspace @obsidian-mcp/app && \
     npm run build:http --workspace @obsidian-mcp/app
 
 # ================= Stage 3: Runner =================
-FROM node:22-slim AS runner
+FROM registry.npmmirror.com/library/node:22-slim AS runner
 WORKDIR /app
 
 # 安装必要的运行时工具
@@ -39,7 +39,8 @@ COPY package.json package-lock.json ./
 COPY packages/app/package.json ./packages/app/
 
 # 2. 关键：只安装生产环境依赖 (omit=dev), 这将大大缩小体积并确保运行时有 node_modules
-RUN npm ci --omit=dev --workspace @obsidian-mcp/app --include-workspace-root
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm ci --omit=dev --workspace @obsidian-mcp/app --include-workspace-root
 
 # 3. 复制编译后的产物，保留其在工作区中的相对路径，以确保能够正确解析 node_modules
 COPY --from=builder /app/packages/app/dist ./packages/app/dist
