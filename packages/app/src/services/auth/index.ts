@@ -19,6 +19,6 @@ export {
 } from './oauth-tokens.js';
 
 export { getAuthStore, setAuthStore } from './auth-store-singleton.js';
-export { createInMemoryAuthStore } from './stores/index.js';
+export { createFileAuthStore, createInMemoryAuthStore } from './stores/index.js';
 
 export { generateSecureToken, verifyCodeChallenge } from './pkce.js';

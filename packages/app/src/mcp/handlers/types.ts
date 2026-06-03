@@ -5,6 +5,7 @@ export interface ToolResponse {
   metadata: {
     timestamp: string;
     affected_files?: string[];
+    affected_items?: string[];
   };
 }
 

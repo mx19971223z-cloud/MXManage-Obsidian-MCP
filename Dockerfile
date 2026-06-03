@@ -1,80 +1,67 @@
-# 多阶段构建：尽量缩小最终镜像体积
-FROM node:22-slim AS builder
+# ================= Stage 1: Dependency Initializer =================
+FROM registry.npmmirror.com/library/node:22-slim AS base
+WORKDIR /app
+# 设置 NPM 镜像源加速
+RUN npm config set registry https://registry.npmmirror.com
 
-WORKDIR /build
-
-# 复制工作区基础文件
-COPY package.json package-lock.json ./
-COPY tsconfig.base.json ./
+# ================= Stage 2: Builder =================
+FROM base AS builder
+# 复制根目录与 Workspace 配置文件
+COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/app/package.json ./packages/app/
 
-# 安装依赖
+# 仅安装构建所需的依赖 (利用缓存)
 RUN npm ci --workspace @obsidian-mcp/app --include-workspace-root
 
-# 复制源码与构建配置
+# 复制源码并构建
 COPY packages/app/src ./packages/app/src
 COPY packages/app/tsconfig.json ./packages/app/
-
-# 构建 stdio 与 http 两种运行产物
 RUN npm run build:stdio --workspace @obsidian-mcp/app && \
     npm run build:http --workspace @obsidian-mcp/app
 
-# 运行阶段：使用精简 Node.js 镜像
-FROM node:22-slim
-
+# ================= Stage 3: Runner =================
+FROM registry.npmmirror.com/library/node:22-slim AS runner
 WORKDIR /app
 
-# 安装 git（运行时 simple-git 依赖）
+# 安装必要的运行时工具
 RUN apt-get update && \
     apt-get install -y git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 从构建阶段复制产物
-COPY --from=builder /build/packages/app/dist/stdio/index.js ./dist/stdio/index.js
-COPY --from=builder /build/packages/app/dist/http/index.js ./dist/http/index.js
-
-# 内联创建启动脚本
-RUN cat > /app/entrypoint.sh <<'EOF'
-#!/bin/sh
-set -e
-
-# 未传参数时默认使用 stdio 模式
-MODE="${1:-stdio}"
-
-case "$MODE" in
-  stdio)
-    echo "以 stdio 模式启动 Obsidian MCP Server..."
-    exec node dist/stdio/index.js
-    ;;
-  http)
-    echo "以 http 模式启动 Obsidian MCP Server..."
-    exec node dist/http/index.js
-    ;;
-  *)
-    echo "错误：无效模式 '$MODE'，仅支持 'stdio' 或 'http'。"
-    echo "用法：docker run ... obsidian-mcp [stdio|http]"
-    echo "  stdio（默认）- 本地 MCP 客户端使用"
-    echo "  http          - 以 HTTP 模式监听 3000 端口"
-    exit 1
-    ;;
-esac
-EOF
-
-RUN chmod +x /app/entrypoint.sh
-
-# 设置默认环境变量
+# 设置生产环境环境变量
 ENV NODE_ENV=production \
     NODE_OPTIONS="--no-warnings" \
     LOCAL_VAULT_PATH=/app/vaults/vault-local
 
-# 创建 git 仓库本地克隆目录（Vault 存储）
+# 1. 复制 package 配置文件以安装生产依赖
+COPY package.json package-lock.json ./
+COPY packages/app/package.json ./packages/app/
+
+# 2. 关键：只安装生产环境依赖 (omit=dev), 这将大大缩小体积并确保运行时有 node_modules
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm ci --omit=dev --workspace @obsidian-mcp/app --include-workspace-root
+
+# 3. 复制编译后的产物，保留其在工作区中的相对路径，以确保能够正确解析 node_modules
+COPY --from=builder /app/packages/app/dist ./packages/app/dist
+
+# 4. 创建必要的目录
 RUN mkdir -p /app/vaults
 
-# 暴露 HTTP 模式端口（传入 'http' 参数时生效）
+# 5. 编写启动脚本 (通过环境变量或参数控制模式)
+COPY <<'EOF' /app/entrypoint.sh
+#!/bin/sh
+set -e
+MODE="${1:-stdio}"
+case "$MODE" in
+  stdio) exec node packages/app/dist/stdio/index.js ;;
+  http)  exec node packages/app/dist/http/index.js ;;
+  *)     echo "Invalid mode: $MODE"; exit 1 ;;
+esac
+EOF
+
+RUN chmod +x /app/entrypoint.sh
 EXPOSE 3000
 
-# 通过自定义启动脚本选择运行模式
-# 默认 stdio
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["stdio"]

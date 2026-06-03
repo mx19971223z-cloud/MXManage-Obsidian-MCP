@@ -67,6 +67,27 @@ export const DeleteNoteSchema = {
   },
 };
 
+export const BulkDeleteSchema = {
+  inputSchema: {
+    paths: z
+      .array(z.string())
+      .optional()
+      .describe('Array of file paths to delete (maximum 5 files total)'),
+    folders: z
+      .array(z.string())
+      .optional()
+      .describe('Array of folder paths to delete (maximum 3 folders total)'),
+    confirm: z.boolean().describe('Must be true to confirm deletion'),
+  },
+  outputSchema: {
+    success: z.boolean(),
+    deleted_files: z.array(z.string()),
+    deleted_folders: z.array(z.string()),
+    total_files: z.number(),
+    total_folders: z.number(),
+  },
+};
+
 export const MoveNoteSchema = {
   inputSchema: {
     source_path: z.string().describe('Current path of the file'),
@@ -241,6 +262,105 @@ export const SearchVaultSchema = {
     ),
     total_matches: z.number(),
     total_files: z.number(),
+  },
+};
+
+export const RagSearchSchema = {
+  inputSchema: {
+    query: z.string().describe('Natural language question or retrieval query'),
+    path_filter: z.string().optional().describe('Optional regex filter for note paths'),
+    tags: z.array(z.string()).optional().describe('Only search notes containing all tags'),
+    limit: z.number().optional().describe('Maximum number of chunks to return (default: 10)'),
+    max_snippet_characters: z
+      .number()
+      .optional()
+      .describe('Maximum characters per returned snippet (default: 700)'),
+  },
+  outputSchema: {
+    query: z.string(),
+    results: z.array(
+      z.object({
+        path: z.string(),
+        title: z.string(),
+        headings: z.array(z.string()),
+        start_line: z.number(),
+        end_line: z.number(),
+        score: z.number(),
+        tags: z.array(z.string()),
+        links: z.array(z.string()),
+        snippet: z.string(),
+        citation: z.string(),
+      }),
+    ),
+    total_results: z.number(),
+    total_chunks_searched: z.number(),
+  },
+};
+
+export const BuildNoteContextSchema = {
+  inputSchema: {
+    query: z.string().optional().describe('Optional topic used to rank chunks'),
+    paths: z.array(z.string()).optional().describe('Explicit note paths to include first'),
+    path_filter: z.string().optional().describe('Optional regex filter for note paths'),
+    tags: z.array(z.string()).optional().describe('Only include notes containing all tags'),
+    max_characters: z
+      .number()
+      .optional()
+      .describe('Maximum context package size in characters (default: 6000)'),
+  },
+  outputSchema: {
+    context: z.string(),
+    character_count: z.number(),
+    max_characters: z.number(),
+    sources: z.array(
+      z.object({
+        path: z.string(),
+        title: z.string(),
+        citations: z.array(z.string()),
+      }),
+    ),
+  },
+};
+
+export const InspectKnowledgeMapSchema = {
+  inputSchema: {
+    query: z.string().optional().describe('Optional topic used to select related notes'),
+    path_filter: z.string().optional().describe('Optional regex filter for note paths'),
+    tags: z.array(z.string()).optional().describe('Only inspect notes containing all tags'),
+    include_orphans: z.boolean().optional().describe('Include orphan notes (default: true)'),
+    limit: z.number().optional().describe('Maximum number of selected notes (default: 50)'),
+  },
+  outputSchema: {
+    notes: z.array(
+      z.object({
+        path: z.string(),
+        title: z.string(),
+        tags: z.array(z.string()),
+        aliases: z.array(z.string()),
+        outgoing_links: z.array(z.string()),
+      }),
+    ),
+    links: z.array(
+      z.object({
+        source: z.string(),
+        target: z.string(),
+        unresolved: z.boolean(),
+      }),
+    ),
+    backlinks: z.array(
+      z.object({
+        source: z.string(),
+        target: z.string(),
+      }),
+    ),
+    tag_clusters: z.array(
+      z.object({
+        tag: z.string(),
+        count: z.number(),
+        notes: z.array(z.string()),
+      }),
+    ),
+    orphan_notes: z.array(z.string()),
   },
 };
 

@@ -12,12 +12,13 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import express from 'express';
+import { join } from 'path';
 import { GitVaultManager } from '@/services/git-vault-manager';
 import { registerTools } from '@/mcp/tool-registrations';
 import { registerResources } from '@/mcp/resource-registrations';
 import { registerOAuthRoutes } from '@/server/shared/oauth-routes';
 import { registerMcpRoute } from '@/server/shared/mcp-routes';
-import { createInMemoryAuthStore } from '@/services/auth/stores';
+import { createFileAuthStore } from '@/services/auth/stores';
 import { setAuthStore } from '@/services/auth';
 import { loadEnv, ensureEnvVars } from '@/env';
 import { MCP_SERVER_INSTRUCTIONS } from '@/server/shared/instructions';
@@ -38,12 +39,13 @@ try {
   process.exit(1);
 }
 
-setAuthStore(createInMemoryAuthStore());
-
 const LOCAL_VAULT_PATH = process.env.LOCAL_VAULT_PATH || './vault-local';
 const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID || 'obsidian-mcp-client';
 const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const AUTH_STORE_FILE = process.env.OAUTH_STORE_FILE || join(process.cwd(), '.data', 'oauth-store.json');
+
+setAuthStore(await createFileAuthStore(AUTH_STORE_FILE));
 
 if (!OAUTH_CLIENT_SECRET) {
   console.error('✗ 缺少 OAUTH_CLIENT_SECRET！');
@@ -80,7 +82,17 @@ registerOAuthRoutes(app, {
 
 registerMcpRoute(app, mcpServer);
 
-const PORT = parseInt(process.env.PORT || '3000');
+// 优先从 BASE_URL 中提取端口，如果没有则使用环境变量或默认 3000
+const getPortFromUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.port ? parseInt(parsed.port) : 3000;
+  } catch {
+    return 3000;
+  }
+};
+
+const PORT = parseInt(process.env.PORT || getPortFromUrl(BASE_URL).toString());
 
 app.listen(PORT, () => {
   console.log(`

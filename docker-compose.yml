@@ -1,0 +1,25 @@
+services:
+  obsidian-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: obsidian-mcp
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - LOCAL_VAULT_PATH=/app/vaults/my-vault
+      # 以下为业务级环境变量，如果配置过多，建议使用 env_file: - .env
+    env_file:
+      - .env
+    volumes:
+      # 将本地的 Obsidian 库挂载到容器内
+      # 请将左侧路径更改为您本地的实际库路径
+      - ./vaults:/app/vaults
+    ports:
+      - "3000:3000"
+    # 默认启动 HTTP 模式，如果是 client 调用 stdio 模式，建议直接运行 docker 而非 compose
+    command: ["http"]
+
+networks:
+  default:
+    name: mcp-network

@@ -18,10 +18,18 @@
 
 ---
 
+### 📖 文档导航
+
+- [**🚀 使用指南 (USAGE.md) - 配置、认证与客户端接入**](./USAGE.md)
+- [**🐳 部署文档 (DEPLOYMENT.md) - Docker 部署细节**](./DEPLOYMENT.md)
+
+---
+
 ## ✨ 核心特性
 
 - 📂 **全量笔记操作**：读写、创建、删除、重命名，支持语义补丁与 Diff 修改。
 - 🔍 **智能语义检索**：内置模糊检索评级与上下文片段返回，让 AI 更懂你的笔记。
+- 🧠 **RAG 上下文技能**：按标题切片 Markdown，返回可引用片段、上下文包和知识图谱。
 - 🏷️ **标签自动化系统**：全库标签聚合、统计、合并与重命名，告别标签混乱。
 - 🗓️ **结构化工作流**：自动维护每日日记，结构化记录 AI 交互与工作摘要。
 - 🔄 **Git 自动化引擎**：原生支持 GitHub、GitLab、Gitee，写入即备份。
@@ -33,21 +41,24 @@
 
 ## 🛠️ MCP 工具手册
 
-| 类目 | 工具 | 功能描述 |
-| :--- | :--- | :--- |
-| **文件管理** | `read-note(s)` | 读取单个或多个笔记内容 |
-| | `create/edit-note` | 创建或覆盖更新笔记，支持自动建目录 |
-| | `append/patch-content` | **[强力]** 追加内容或基于语义锚点进行局部补丁 |
-| | `apply-diff-patch` | 应用标准 Unified Diff 补丁，精准修改 |
-| | `delete/move-note` | 安全删除或重命名/移动笔记 |
-| **目录架构** | `create-directory` | 递归创建目录结构 |
-| | `list-files-in-vault` | 全库文件结构扫描（支持类型过滤） |
-| | `list-files-in-dir` | 指定目录下文件列表获取 |
-| **智能检索** | `search-vault` | 模糊+精确混合检索，带评分与上下文预览 |
-| **标签治理** | `add/remove-tags` | 为笔记添加或移除标签 |
-| | `rename-tag` | **[全库]** 自动化重命名所有文件中的旧标签 |
-| | `manage-tags` | 标签聚合列表、计数统计与逻辑合并 |
-| **日记工作流** | `log-journal-entry` | **[推荐]** 自动在每日笔记中追加结构化工作进度 |
+| 类目           | 工具                    | 功能描述                                             |
+| :------------- | :---------------------- | :--------------------------------------------------- |
+| **文件管理**   | `read-note(s)`          | 读取单个或多个笔记内容                               |
+|                | `create/edit-note`      | 创建或覆盖更新笔记，支持自动建目录                   |
+|                | `append/patch-content`  | **[强力]** 追加内容或基于语义锚点进行局部补丁        |
+|                | `apply-diff-patch`      | 应用标准 Unified Diff 补丁，精准修改                 |
+|                | `delete/move-note`      | 安全删除或重命名/移动笔记                            |
+| **目录架构**   | `create-directory`      | 递归创建目录结构                                     |
+|                | `list-files-in-vault`   | 全库文件结构扫描（支持类型过滤）                     |
+|                | `list-files-in-dir`     | 指定目录下文件列表获取                               |
+| **智能检索**   | `search-vault`          | 模糊+精确混合检索，带评分与上下文预览                |
+| **RAG 知识库** | `rag-search`            | 面向问答的标题感知切片检索，返回 citation-ready 片段 |
+|                | `build-note-context`    | 按路径、标签或主题构建受预算约束的来源上下文包       |
+|                | `inspect-knowledge-map` | 扫描 Obsidian 双链、反链、标签簇与孤岛笔记           |
+| **标签治理**   | `add/remove-tags`       | 为笔记添加或移除标签                                 |
+|                | `rename-tag`            | **[全库]** 自动化重命名所有文件中的旧标签            |
+|                | `manage-tags`           | 标签聚合列表、计数统计与逻辑合并                     |
+| **日记工作流** | `log-journal-entry`     | **[推荐]** 自动在每日笔记中追加结构化工作进度        |
 
 ---
 
@@ -76,9 +87,9 @@ cp .env.example .env
 我们欢迎任何形式的贡献！无论是功能建议、Bug 反馈还是代码提交。
 
 - **开源协议**: [MIT License](LICENSE)
+
 ---
 
 <p align="right">
   Made with ❤️ for the Obsidian Community
 </p>
-

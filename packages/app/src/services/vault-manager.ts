@@ -2,6 +2,7 @@ export interface VaultManager {
   readFile(relativePath: string): Promise<string>;
   writeFile(relativePath: string, content: string): Promise<void>;
   deleteFile(relativePath: string): Promise<void>;
+  deleteDirectory(relativePath: string): Promise<void>;
   moveFile(sourcePath: string, destPath: string): Promise<void>;
   createDirectory(relativePath: string, recursive: boolean): Promise<void>;
   listFiles(
@@ -13,5 +14,6 @@ export interface VaultManager {
     },
   ): Promise<string[]>;
   fileExists(relativePath: string): Promise<boolean>;
+  isDirectory(relativePath: string): Promise<boolean>;
   getVaultPath(): string;
 }

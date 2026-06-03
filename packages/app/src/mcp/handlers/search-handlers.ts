@@ -32,10 +32,19 @@ export async function handleSearchVault(
     limit?: number;
   },
 ): Promise<ToolResponse> {
+  const startedAt = Date.now();
   try {
     const isExact = args.exact || false;
     const limit = args.limit || 50;
     const fileTypes = args.file_types || ['md'];
+
+    logger.info('search-vault started', {
+      query: args.query,
+      exact: isExact,
+      limit,
+      fileTypes,
+      pathFilter: args.path_filter || '',
+    });
 
     // 列出全部文件
     const allFiles = await vault.listFiles('', {
@@ -43,27 +52,52 @@ export async function handleSearchVault(
       recursive: true,
     });
 
+    logger.debug('search-vault listFiles completed', {
+      totalFilesInVault: allFiles.length,
+      sampleFiles: allFiles.slice(0, 5),
+    });
+
     // 如提供路径过滤条件，则先筛选文件
     let filesToSearch = allFiles;
     if (args.path_filter) {
       const pathRegex = new RegExp(args.path_filter, 'i');
       filesToSearch = allFiles.filter(f => pathRegex.test(f));
+
+      logger.info('search-vault path filter applied', {
+        pathFilter: args.path_filter,
+        beforeCount: allFiles.length,
+        afterCount: filesToSearch.length,
+      });
     }
 
     const results = isExact
       ? await performExactSearch(vault, filesToSearch, args.query, limit)
       : await performFuzzySearch(vault, filesToSearch, args.query, limit);
 
+    logger.info('search-vault completed', {
+      durationMs: Date.now() - startedAt,
+      query: args.query,
+      searchedFileCount: filesToSearch.length,
+      resultCount: results.length,
+      matchedPaths: results.slice(0, 10).map(item => item.path),
+    });
+
     return {
       success: true,
       data: {
         results,
         total_matches: results.length,
-        total_files: results.length,
+        total_files: filesToSearch.length,
       },
       metadata: { timestamp: new Date().toISOString() },
     };
   } catch (error: any) {
+    logger.error('search-vault failed', {
+      durationMs: Date.now() - startedAt,
+      query: args.query,
+      pathFilter: args.path_filter || '',
+      error: error?.message || String(error),
+    });
     return {
       success: false,
       error: error.message,
