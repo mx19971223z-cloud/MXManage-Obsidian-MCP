@@ -1,5 +1,5 @@
 # ================= Stage 1: Dependency Initializer =================
-FROM registry.npmmirror.com/library/node:22-slim AS base
+FROM node:22-slim AS base
 WORKDIR /app
 # 设置 NPM 镜像源加速
 RUN npm config set registry https://registry.npmmirror.com
@@ -20,7 +20,7 @@ RUN npm run build:stdio --workspace @obsidian-mcp/app && \
     npm run build:http --workspace @obsidian-mcp/app
 
 # ================= Stage 3: Runner =================
-FROM registry.npmmirror.com/library/node:22-slim AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
 # 安装必要的运行时工具
