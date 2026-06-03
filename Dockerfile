@@ -1,5 +1,5 @@
 # 多阶段构建：尽量缩小最终镜像体积
-FROM node:22-slim AS builder
+FROM registry.aliyuncs.com/library/node:22-slim AS builder
 
 WORKDIR /build
 
@@ -20,7 +20,7 @@ RUN npm run build:stdio --workspace @obsidian-mcp/app && \
     npm run build:http --workspace @obsidian-mcp/app
 
 # 运行阶段：使用精简 Node.js 镜像
-FROM node:22-slim
+FROM registry.aliyuncs.com/library/node:22-slim
 
 WORKDIR /app
 
