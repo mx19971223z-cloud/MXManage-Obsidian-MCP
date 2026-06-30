@@ -1,41 +1,252 @@
-# Dependencies
-node_modules/
+# ============================================================
+# 通用 .gitignore 文件
+# 适用于：Java / Spring Boot / Maven / Gradle / Node.js / Python / Go / C# / 移动端 等多语言项目
+# ============================================================
 
-# Build outputs
-dist/
-*.js
-*.d.ts
-*.js.map
-*.d.ts.map
-
-# Environment configuration (IMPORTANT!)
-.env
-.env.*
-!.env.example
-
-# Local development vault
-vault-local/
-
-# IDE
-.vscode/
+# ===================== IDE / 编辑器 =====================
+# IntelliJ IDEA
 .idea/
+*.iml
+*.iws
+*.ipr
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+.c9/
+# VS Code（保留工作区配置）
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Vim
 *.swp
 *.swo
-*~
+# Notepad++
+*.bak
+# JetBrains Rider
+.idea/
 
-# OS
-.DS_Store
+# ===================== 操作系统 =====================
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.__MACOSX
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
 
-# Logs
+# ===================== 通用临时 / 日志 / 缓存 =====================
+tmp/
+temp/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Testing
-coverage/
-
-# Temporary files
-*.tmp
+logs/
+spring-boot-*.log
+hs_err_pid*
+dump.hprof
 .cache/
+.eslintcache
+*.tsbuildinfo
+
+# ===================== 压缩包 / 备份 =====================
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.backup
+*.old
+
+# ===================== 密钥 / 敏感文件 / 本地配置 =====================
+*.pem
+*.key
+*.crt
+*.cert
+*.password
+secret*
+config.local.*
+local.config.*
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ===================== 数据库文件 =====================
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# ===================== Java / Maven / Gradle / Spring Boot =====================
+# Maven
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing/
+.mvn/wrapper/maven-wrapper.properties
+# Gradle
+.gradle/
+**/build/
+!src/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+# 编译产物
+**/*.class
+**/generated-sources/
+**/generated-test-sources/
+# 打包产物（发布包由 CI 生成，不纳入版本控制）
+# 注意：如需保留 Maven Wrapper 的 jar，上方已用 ! 规则排除
+*.war
+*.ear
+# Spring Boot
+spring-boot-devtools.properties
+
+# ===================== Node.js / 前端 (JS/TS/Vue/React) =====================
+node_modules/
+.npm
+.npmrc
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+coverage/
+.vercel
+.next/
+.nuxt/
+.vuepress/dist/
+.nuxt/
+.output/
+.cache/
+.temp/
+.svelte-kit/
+
+# ===================== Python =====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+*.pyd
+.pytest_cache/
+*.egg-info/
+*.egg
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# ===================== Go =====================
+vendor/
+*.exe
+*.test
+*.out
+go.work.sum
+
+# ===================== C / C++ / CMake =====================
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+*.o
+*.obj
+*.dll
+*.lib
+*.a
+*.so
+*.d
+
+# ===================== C# / .NET =====================
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pdb
+.vs/
+.vscode/
+*.nuget.props
+*.nuget.targets
+
+# ===================== Android =====================
+# Gradle（已在 Java 部分覆盖）
+captures/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+# Keystore（敏感文件）
+*.jks
+*.keystore
+
+# ===================== iOS / macOS (Swift / ObjC) =====================
+Pods/
+*.xcworkspace
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata
+*.xcuserstate
+*.xcuserdatad
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# ===================== Docker 相关 =====================
+**/docker/data/
+.dockerignore
+docker-compose.override.yml
+
+# ===================== 其他工具 =====================
+# SDKMAN
+.sdkman/
+# Direnv
+.direnv/
+.envrc
+# Helm
+*.tgz
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
