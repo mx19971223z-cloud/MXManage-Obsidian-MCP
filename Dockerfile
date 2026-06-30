@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 # ================= Stage 1: Dependency Initializer =================
 FROM node:22-slim AS base
 WORKDIR /app
 # 设置 NPM 镜像源加速
 RUN npm config set registry https://registry.npmmirror.com
+=======
+# 多阶段构建：尽量缩小最终镜像体积
+FROM registry.aliyuncs.com/library/node:22-slim AS builder
+>>>>>>> ff599372f582b843cd492a6b31ada25a7377079c
 
 # ================= Stage 2: Builder =================
 FROM base AS builder
@@ -19,8 +24,14 @@ COPY packages/app/tsconfig.json ./packages/app/
 RUN npm run build:stdio --workspace @obsidian-mcp/app && \
     npm run build:http --workspace @obsidian-mcp/app
 
+<<<<<<< HEAD
 # ================= Stage 3: Runner =================
 FROM node:22-slim AS runner
+=======
+# 运行阶段：使用精简 Node.js 镜像
+FROM registry.aliyuncs.com/library/node:22-slim
+
+>>>>>>> ff599372f582b843cd492a6b31ada25a7377079c
 WORKDIR /app
 
 # 安装必要的运行时工具
