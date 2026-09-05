@@ -64,6 +64,7 @@ const vaultManager = new GitVaultManager({
 const mcpServer = new McpServer({
   name: 'obsidian-mcp',
   version: '1.0.0',
+}, {
   instructions: MCP_SERVER_INSTRUCTIONS,
 });
 

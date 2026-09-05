@@ -125,6 +125,7 @@ spring-boot-devtools.properties
 
 # ===================== Node.js / 前端 (JS/TS/Vue/React) =====================
 node_modules/
+dist/
 .npm
 .npmrc
 .yarn/*

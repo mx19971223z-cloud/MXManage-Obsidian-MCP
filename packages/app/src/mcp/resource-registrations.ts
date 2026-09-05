@@ -12,16 +12,17 @@ export function registerResources(server: McpServer, getVaultManager: () => Vaul
     'vault-readme',
     'obsidian://vault-readme',
     {
-      name: 'Vault README',
       description:
         'README.md from the vault root containing vault organization guidelines and structure',
       mimeType: 'text/markdown',
       annotations: {
-        readOnlyHint: true,
-        openWorldHint: true, // 与 Git 托管的 Vault 交互
+        // Resource annotations describe presentation and freshness. Tool-risk
+        // hints (readOnlyHint/openWorldHint) are not valid resource metadata.
+        audience: ['assistant'],
+        priority: 0.8,
       },
     },
-    async uri => {
+    async (uri: URL) => {
       const vault = getVaultManager();
 
       try {
